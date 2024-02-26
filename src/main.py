@@ -72,6 +72,8 @@ def print_lines(line_idx: int, line1: str, line2: str, equal_idxs: Tuple[int, in
     index_str_len = len(str(line_idx)) + 2
     max_line_len = (TERMINAL_COLUMNS - MAX_INDEX_SYMBOLS - index_str_len - len(equal_string)) // 2
 
+    line1 = f"{line1} ({equal_idxs[1]})" if equal_idxs[0] > 0 else line1
+
     zip_lines = zip_longest(
         textwrap.wrap(line1, max_line_len),
         textwrap.wrap(line2, max_line_len),
@@ -124,7 +126,6 @@ def main() -> None:
         line2 = get_file_line_by_idx(file2, i)
 
         equal_idxs = compare_lines(file1_p, file2_p, i)
-        line1 = f"{line1} ({equal_idxs[1]})" if equal_idxs[0] > 0 else line1
         print_lines(i, line1, line2, equal_idxs)
 
 
