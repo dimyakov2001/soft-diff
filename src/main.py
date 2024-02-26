@@ -85,7 +85,7 @@ def main() -> None:
     
     compare_lines = partial(compare_lines_func, ignore_tabs=args.ignore_tabs)
 
-    for i in range(max([file1.lines_count, file2.lines_count])):
+    for i in range(1, max([file1.lines_count, file2.lines_count]) + 1):
         line1 = get_file_line_by_idx(file1, i)
         line2 = get_file_line_by_idx(file2, i)
 
