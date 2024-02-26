@@ -5,6 +5,7 @@ from functools import partial
 from itertools import zip_longest
 from typing import List, Tuple
 import re
+from copy import copy
 
 from pydantic import BaseModel
 
@@ -45,7 +46,7 @@ def read_file(filepath: str) -> FileContent:
             max_line_len=max(len(line) for line in lines)
         )
 
-def preprocess_data(file: FileContent, strip: bool = False, remove_commas: bool = False) -> None:
+def preprocess_data(file: FileContent, strip: bool = False, remove_commas: bool = False) -> FileContent:
     lines = file.lines
 
     if strip:
@@ -54,7 +55,9 @@ def preprocess_data(file: FileContent, strip: bool = False, remove_commas: bool 
     if remove_commas:
         lines = [re.sub("[,:] *$", "", line) for line in lines]
 
-    file.lines = lines
+    file_ = copy(file)
+    file_.lines = lines
+    return file_
 
 
 def print_lines(line_idx: int, line1: str, line2: str, equal_idxs: Tuple[int, int]) -> None:
@@ -93,8 +96,8 @@ def main() -> None:
     file2 = read_file(args.file2)
 
     preprocess_data_ = partial(preprocess_data, strip=args.ignore_tabs, remove_commas=args.ignore_tail_commas)
-    preprocess_data_(file1)
-    preprocess_data_(file2)
+    file1_p = preprocess_data_(file1)
+    file2_p = preprocess_data_(file2)
 
     def get_file_line_by_idx(file: FileContent, line_idx: int) -> str:
         return file.lines[line_idx] if line_idx < file.lines_count else ""
@@ -116,7 +119,7 @@ def main() -> None:
         line1 = get_file_line_by_idx(file1, i)
         line2 = get_file_line_by_idx(file2, i)
 
-        lines_are_equal = compare_lines(file1, file2, i)
+        lines_are_equal = compare_lines(file1_p, file2_p, i)
         print_lines(i, line1, line2, lines_are_equal)
 
 
