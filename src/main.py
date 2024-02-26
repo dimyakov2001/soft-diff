@@ -63,12 +63,11 @@ def preprocess_data(file: FileContent, strip: bool = False, remove_commas: bool 
 
 def print_lines(line_idx: int, line1: str, line2: str, equal_idxs: Tuple[int, int]) -> None:
     if equal_idxs[0] == -1:
-        equal_string = "-"
+        equal_string = "  -  "
     elif equal_idxs[0] == 0:
-        equal_string = "+"
+        equal_string = "  +  "
     else:
-        equal_string = "o"
-    equal_string = f"  {equal_string}  "
+        equal_string = "  o  "
 
     index_str_len = len(str(line_idx)) + 2
     max_line_len = (TERMINAL_COLUMNS - MAX_INDEX_SYMBOLS - index_str_len - len(equal_string)) // 2
@@ -85,7 +84,7 @@ def print_lines(line_idx: int, line1: str, line2: str, equal_idxs: Tuple[int, in
             idx_str + " " * (MAX_INDEX_SYMBOLS - len(idx_str)),
             l1,
             " " * (max_line_len - len(l1)),
-            equal_string,
+            equal_string if i == 0 else "     ",
             l2,
             sep=""
         )
@@ -124,8 +123,9 @@ def main() -> None:
         line1 = get_file_line_by_idx(file1, i)
         line2 = get_file_line_by_idx(file2, i)
 
-        lines_are_equal = compare_lines(file1_p, file2_p, i)
-        print_lines(i, line1, line2, lines_are_equal)
+        equal_idxs = compare_lines(file1_p, file2_p, i)
+        line1 = f"{line1} ({equal_idxs[1]})" if equal_idxs[0] > 0 else line1
+        print_lines(i, line1, line2, equal_idxs)
 
 
 if __name__ == "__main__":
