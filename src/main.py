@@ -45,7 +45,9 @@ def read_file(filepath: str) -> FileContent:
 
 
 def print_lines(line_idx: int, line1: str, line2: str, lines_are_equal: bool) -> None:
-    max_line_len = (TERMINAL_COLUMNS - len(str(line_idx)) - 2 - 2 * len(COLUMN_GAP) - 1) // 2
+    index_str_len = len(str(line_idx)) + 2
+    gap_str_len = 2 * len(COLUMN_GAP) + 1
+    max_line_len = (TERMINAL_COLUMNS - index_str_len - gap_str_len) // 2
 
     zip_lines = zip_longest(
         textwrap.wrap(line1, max_line_len),
