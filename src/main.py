@@ -10,6 +10,7 @@ from copy import copy
 from pydantic import BaseModel
 
 TERMINAL_COLUMNS = shutil.get_terminal_size().columns
+MAX_INDEX_SYMBOLS = 0
 
 
 class Args(BaseModel):
@@ -66,11 +67,11 @@ def print_lines(line_idx: int, line1: str, line2: str, equal_idxs: Tuple[int, in
     elif equal_idxs[0] == 0:
         equal_string = "+"
     else:
-        equal_string = f"({equal_idxs[0]}:{equal_idxs[1]})"
+        equal_string = "o"
     equal_string = f"  {equal_string}  "
 
     index_str_len = len(str(line_idx)) + 2
-    max_line_len = (TERMINAL_COLUMNS - index_str_len - len(equal_string)) // 2
+    max_line_len = (TERMINAL_COLUMNS - MAX_INDEX_SYMBOLS - index_str_len - len(equal_string)) // 2
 
     zip_lines = zip_longest(
         textwrap.wrap(line1, max_line_len),
@@ -79,8 +80,9 @@ def print_lines(line_idx: int, line1: str, line2: str, equal_idxs: Tuple[int, in
     )
 
     for i, (l1, l2) in enumerate(zip_lines):
+        idx_str = f"{line_idx}) " if i == 0 else " "
         print(
-            f"{line_idx}) " if i == 0 else " " * (len(str(line_idx)) + 2),
+            idx_str + " " * (MAX_INDEX_SYMBOLS - len(idx_str)),
             l1,
             " " * (max_line_len - len(l1)),
             equal_string,
@@ -90,10 +92,13 @@ def print_lines(line_idx: int, line1: str, line2: str, equal_idxs: Tuple[int, in
 
 
 def main() -> None:
+    global MAX_INDEX_SYMBOLS
     args = parse_args()
 
     file1 = read_file(args.file1)
     file2 = read_file(args.file2)
+
+    MAX_INDEX_SYMBOLS = len(str(max(file1.lines_count, file2.lines_count))) + 2
 
     preprocess_data_ = partial(preprocess_data, strip=args.ignore_tabs, remove_commas=args.ignore_tail_commas)
     file1_p = preprocess_data_(file1)
